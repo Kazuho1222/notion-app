@@ -7,9 +7,26 @@ import { supabase } from './supabase/client';
 
 function App() {
   const [notes, setNotes] = useState<Note[]>([]);
+  const [previewMode, setPreviewMode] = useState(false);
 
   useEffect(() => {
     fetchNotes();
+    const mySubscription = supabase
+      .channel('note')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'note'
+        },
+        fetchNotes
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(mySubscription);
+    };
   }, []);
 
   const fetchNotes = async () => {
@@ -36,6 +53,19 @@ function App() {
     }
   };
 
+  const handleContentChange = async (content: string) => {
+    const { error } = await supabase
+      .from('note')
+      .update({ content })
+      .eq('id', notes[0].id);
+    if (error) {
+      console.error("Error updating note", error);
+      return;
+    } else {
+      fetchNotes();
+    }
+  };
+
   return (
     <div className="flex h-screen">
       <div className="w-[300px] bg-gray-100 p-4">
@@ -52,13 +82,18 @@ function App() {
       <div className="flex-1 p-4">
         <div className='mb-4 flex justify-between'>
           <h2 className='text-xl font-bold'>Note Editor</h2>
-          <button className='p-2 bg-green-500 text-white font-bold rounded'>
-            Preview
+          <button className='p-2 bg-green-500 text-white font-bold rounded'
+            onClick={() => setPreviewMode(!previewMode)}
+          >
+            {previewMode ? 'Edit' : 'Preview'}
           </button>
         </div>
-        <NoteEditor content={notes[0]?.content} />
+        <NoteEditor
+          content={notes[0]?.content}
+          isPreviewMode={previewMode}
+          onContentChange={handleContentChange} />
       </div>
-    </div>
+    </div >
   );
 }
 

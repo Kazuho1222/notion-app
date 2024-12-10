@@ -19,7 +19,7 @@ const NoteEditor: React.FC<Props> = ({
   ) : (
     <textarea
       className="w-full h-[500px] p-2 border border-gray-300 rounded"
-      defaultValue={content}
+      value={content}
       onChange={(e) => onContentChange(e.target.value)}
     />
   );

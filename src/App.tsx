@@ -58,7 +58,7 @@ function App() {
     const { error } = await supabase
       .from('note')
       .update({ content })
-      .eq('id', notes[0].id);
+      .eq('id', currentNoteId);
     if (error) {
       console.error("Error updating note", error);
       return;

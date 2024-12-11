@@ -78,6 +78,18 @@ function App() {
     }
   };
 
+  const handleDeleteNote = async (id: number) => {
+    const { error } = await supabase
+      .from('note')
+      .delete()
+      .eq('id', id);
+    if (error) {
+      console.error("Error deleting note", error);
+      return;
+    }
+    fetchNotes();
+  };
+
   return (
     <div className="flex h-screen">
       <div className="w-[300px] bg-gray-100 p-4">
@@ -94,6 +106,7 @@ function App() {
           selectNoteId={currentNoteId}
           onSelect={(note) => setCurrentNoteId(note.id)}
           handleChangeTitle={handleChangeTitle}
+          handleDeleteNote={handleDeleteNote}
         />
       </div>
       <div className="flex-1 p-4">

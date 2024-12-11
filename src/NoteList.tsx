@@ -1,15 +1,17 @@
 import { useState } from "react";
 import { Note } from "./Note";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPen } from "@fortawesome/free-solid-svg-icons";
+import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
+
 type Props = {
   notes: Note[];
   selectNoteId: number | null;
   onSelect: (note: Note) => void;
   handleChangeTitle: (title: string) => void;
+  handleDeleteNote: (id: number) => void;
 };
 
-const NoteList: React.FC<Props> = ({ notes, selectNoteId, onSelect, handleChangeTitle }) => {
+const NoteList: React.FC<Props> = ({ notes, selectNoteId, onSelect, handleChangeTitle, handleDeleteNote }) => {
   const [editingTitle, setEditingTitle] = useState("");
   const [selectEditTitleNoteId, setSelectEditTitleNoteId] = useState<number | null>(null);
   return (
@@ -36,15 +38,23 @@ const NoteList: React.FC<Props> = ({ notes, selectNoteId, onSelect, handleChange
           ) : (
             <span>{note.title}</span>
           )}
-          <button
-            className="ml-2 text-blue-500"
-            onClick={() => {
-              setEditingTitle(note.title);
-              setSelectEditTitleNoteId(note.id);
-            }}
-          >
-            <FontAwesomeIcon icon={faPen} />
-          </button>
+          <div className="flex items-center">
+            <button
+              className="text-blue-500"
+              onClick={() => {
+                setEditingTitle(note.title);
+                setSelectEditTitleNoteId(note.id);
+              }}
+            >
+              <FontAwesomeIcon icon={faPen} />
+            </button>
+            <button
+              className="ml-4 text-red-500"
+              onClick={() => handleDeleteNote(note.id)}
+            >
+              <FontAwesomeIcon icon={faTrash} />
+            </button>
+          </div>
         </li>
       ))}
     </ul>
